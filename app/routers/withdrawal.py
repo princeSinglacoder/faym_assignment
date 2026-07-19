@@ -25,10 +25,10 @@ def request_withdrawal(withdrawal_in: CreateWithdrawal, request: Request, db: Se
     current_user = get_current_user(request, db)
 
     # Only CREATOR can request withdrawal for themselves
-    if current_user.role == "ADMIN":
+    if current_user.role != "ADMIN" and current_user.role != "CREATOR":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admins cannot request withdrawals."
+            detail="You are not authorized to request withdrawals."
         )
 
     result = withdrawalService.request_withdrawal(
