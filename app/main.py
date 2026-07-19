@@ -13,6 +13,9 @@ print("Registered tables on Base.metadata:", list(Base.metadata.tables.keys()))
 
 app = FastAPI(title="Faym Affiliate Payout Management System")
 
+from app.routers.auth import router as auth_router
+app.include_router(auth_router)
+
 @app.get("/")
 async def root():
     return {"message": "Faym Assessment API is live!"}
