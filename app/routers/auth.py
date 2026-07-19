@@ -71,6 +71,17 @@ def logout(response: Response):
     response.delete_cookie("access_token")
     return {"message": "Logout successfully"}
 
+@router.get("/me", response_model=UserResponse)
+def refresh_session(request: Request, db: Session = Depends(get_db)):
+    """
+    Called on page refresh.
+    Checks if token in cookie is still valid.
+    If valid  → returns user data (user stays logged in).
+    If expired/missing → returns 401 (frontend redirects to login).
+    """
+    current_user = get_current_user(request, db)
+    return current_user
+
 # Manual Dependency to get current active user from Cookie
 def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
     token = request.cookies.get("access_token")

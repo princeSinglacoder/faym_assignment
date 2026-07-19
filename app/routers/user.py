@@ -42,6 +42,7 @@ def get_user_by_id(user_id: str, request: Request, db: Session = Depends(get_db)
     current_user = get_current_user(request, db)
 
     # Only admin can access other user's data
+    # print(current_user.id,user_id)
     if current_user.role != "ADMIN" and current_user.id != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
