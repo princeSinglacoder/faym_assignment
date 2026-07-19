@@ -126,16 +126,14 @@ def reconcile_sale(sale_id: str, new_status: str, db: Session) -> dict:
         current_balance = float(user.withdrawable_balance)
 
         if advance_paid > 0:
-            # Deduct whatever is available, no negative balance allowed
-            deduction = min(advance_paid, current_balance)
-            user.withdrawable_balance = current_balance - deduction
+            user.withdrawable_balance = current_balance - advance_paid
             sale.status = "rejected"
             db.commit()
 
             return {
                 "message": "Sale rejected. Advance payout recovered.",
                 "sale_id": sale_id,
-                "advance_deducted": round(deduction, 2),
+                "advance_deducted": round(advance_paid, 2),
                 "balance_remaining": round(float(user.withdrawable_balance), 2)
             }
         else:
