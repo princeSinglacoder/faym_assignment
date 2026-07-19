@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from pydantic import BaseModel, Field
+from typing import Optional
 
 from app.database.database import get_db
 from app.schemas.sale import CreateSale, SaleResponse
@@ -12,6 +13,9 @@ router = APIRouter(prefix="/sales", tags=["Sales"])
 
 class ReconcileRequest(BaseModel):
     status: str = Field(..., pattern="^(approved|rejected)$")
+
+class AdvanceRequest(BaseModel):
+    user_id: str
 
 @router.post("", response_model=SaleResponse, status_code=status.HTTP_201_CREATED)
 def create_sale(sale_in: CreateSale, request: Request, db: Session = Depends(get_db)):
@@ -37,23 +41,17 @@ def create_sale(sale_in: CreateSale, request: Request, db: Session = Depends(get
     return sale
 
 @router.post("/advance")
-def process_advance(request: Request, db: Session = Depends(get_db)):
+def process_advance(body: AdvanceRequest, request: Request, db: Session = Depends(get_db)):
     """
-    Process advance payout for the logged-in user.
+    Admin only. Process advance payout for a specific creator.
     - Finds all pending sales where advance not yet paid.
     - Credits 10% of each sale's earning to withdrawable_balance.
     - Marks is_advance_paid = True for each processed sale.
     """
-    current_user = get_current_user(request, db)
-
-    if current_user.role != "ADMIN":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You are not authorized to process advance payout."
-        )
+    check_admin_role(request, db)  # Only admin can process advance payouts
 
     result = saleService.process_advance_payout(
-        user_id=current_user.id,
+        user_id=body.user_id,
         db=db
     )
     return result

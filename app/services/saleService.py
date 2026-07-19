@@ -81,7 +81,7 @@ def reconcile_sale(sale_id: str, new_status: str, db: Session) -> dict:
       - Credit remaining 90% to user's withdrawable_balance
 
     Rejected:
-      - Deduct advance (10%) from user's withdrawable_balance if balance available
+      - Deduct advance (10%) from user's withdrawable_balance (balance can go negative)
     """
     sale = db.query(Sale).filter(Sale.id == sale_id).first()
     if not sale:
@@ -122,27 +122,15 @@ def reconcile_sale(sale_id: str, new_status: str, db: Session) -> dict:
         }
 
     elif new_status == "rejected":
-        # Deduct the advance amount already paid (if any)
+        # Always deduct the advance amount — balance can go negative
         current_balance = float(user.withdrawable_balance)
+        user.withdrawable_balance = current_balance - advance_paid
+        sale.status = "rejected"
+        db.commit()
 
-        if advance_paid > 0:
-            user.withdrawable_balance = current_balance - advance_paid
-            sale.status = "rejected"
-            db.commit()
-
-            return {
-                "message": "Sale rejected. Advance payout recovered.",
-                "sale_id": sale_id,
-                "advance_deducted": round(advance_paid, 2),
-                "balance_remaining": round(float(user.withdrawable_balance), 2)
-            }
-        else:
-            # No advance was paid, just reject
-            sale.status = "rejected"
-            db.commit()
-
-            return {
-                "message": "Sale rejected. No advance was paid, nothing to recover.",
-                "sale_id": sale_id,
-                "advance_deducted": 0.0
-            }
+        return {
+            "message": "Sale rejected. Advance payout recovered." if advance_paid > 0 else "Sale rejected. No advance was paid, nothing to recover.",
+            "sale_id": sale_id,
+            "advance_deducted": round(advance_paid, 2),
+            "balance_remaining": round(float(user.withdrawable_balance), 2)
+        }
