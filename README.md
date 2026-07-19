@@ -1,5 +1,25 @@
 # Faym SDE Intern Assignment – Creator Payout System
 
+# 🚀 Live Demo
+
+Swagger API Documentation
+
+https://faym-assign.onrender.com/docs
+
+---
+
+## Test Credentials
+
+### Admin
+
+Email: admin@faym.com
+Password: admin123
+
+### Creator
+
+Email: singlaprince349@gmail.com
+password: 12345678
+
 ## Overview
 
 This project is a backend system built using **FastAPI** to simulate a creator payout workflow for a creator-commerce platform like Faym.
