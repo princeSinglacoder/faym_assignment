@@ -46,7 +46,7 @@ def process_advance(request: Request, db: Session = Depends(get_db)):
     """
     current_user = get_current_user(request, db)
 
-    if current_user.role != "CREATOR":
+    if current_user.role != "ADMIN":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You are not authorized to process advance payout."
