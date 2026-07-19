@@ -200,6 +200,7 @@ Protected APIs automatically verify the logged-in user before processing request
 
 ```bash
 git clone <https://github.com/princeSinglacoder/faym_assignment>
+
 ```
 
 ---
@@ -254,9 +255,8 @@ uvicorn app.main:app --reload
 Swagger
 
 ```
-http://localhost:8000/docs
+Live Backend URL: https://faym-assign.onrender.com/docs  to test APIs in web browser
 ```
-
 ---
 
 # Default Admin Account
