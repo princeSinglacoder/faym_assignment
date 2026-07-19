@@ -5,7 +5,6 @@ class CreateUser(BaseModel):
     name: str = Field(..., min_length=1)
     email: EmailStr
     password: str = Field(..., min_length=6)
-    role: Optional[str] = "CREATOR"
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
