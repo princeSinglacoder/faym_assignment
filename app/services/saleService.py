@@ -51,12 +51,14 @@ def process_advance_payout(user_id: str, db: Session) -> dict:
         }
 
     total_advance = 0.0
+    # Fetch user once outside loop — not on every iteration
+    user = db.query(User).filter(User.id == user_id).first()
+
     for sale in eligible_sales:
         advance_amount = float(sale.earning) * 0.10
         total_advance += advance_amount
 
         # Credit 10% to user balance
-        user = db.query(User).filter(User.id == user_id).first()
         user.withdrawable_balance = float(user.withdrawable_balance) + advance_amount
 
         # Mark advance as paid
